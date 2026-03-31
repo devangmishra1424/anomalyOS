@@ -1,0 +1,27 @@
+torch==2.1.0
+torchvision==0.16.0
+opencv-python-headless==4.9.0.80
+onnxruntime==1.17.1
+faiss-cpu==1.8.0
+sentence-transformers==2.7.0
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+pydantic==2.6.4
+gradio==4.26.0
+networkx==3.3
+pyvis==0.3.2
+shap==0.45.0
+scikit-image==0.22.0
+imagehash==4.3.1
+scipy==1.13.0
+scikit-learn==1.4.2
+numpy==1.26.4
+huggingface_hub==0.22.2
+tenacity==8.2.3
+reportlab==4.1.0
+httpx==0.27.0
+python-dotenv==1.0.1
+joblib==1.4.0
+psutil==5.9.8
+clip @ git+https://github.com/openai/CLIP.git@dcba3cb2e2827b402d2701e7e1d7d17226bb5b9c

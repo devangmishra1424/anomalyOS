@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements_space.txt .
+RUN pip install --no-cache-dir -r requirements_space.txt
 
 COPY src/ ./src/
 COPY api/ ./api/
