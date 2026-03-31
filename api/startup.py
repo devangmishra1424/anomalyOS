@@ -23,6 +23,55 @@ from api.logger import init_logger
 STARTUP_TIME = None
 MODEL_VERSION = "v1.0"
 
+def download_artifacts():
+    """Download all required artifacts from HF Dataset at startup."""
+    from huggingface_hub import hf_hub_download, snapshot_download
+    import shutil
+
+    HF_REPO = "CaffeinatedCoding/anomalyos-logs"
+    token = os.environ.get("HF_TOKEN")
+    
+    os.makedirs("data", exist_ok=True)
+
+    files_to_download = [
+        ("models/pca_256.pkl",              "data/pca_256.pkl"),
+        ("configs/thresholds.json",          "data/thresholds.json"),
+        ("graph/knowledge_graph.json",       "data/knowledge_graph.json"),
+        ("indexes/index1_category.faiss",    "data/index1_category.faiss"),
+        ("indexes/index1_metadata.json",     "data/index1_metadata.json"),
+        ("indexes/index2_defect.faiss",      "data/index2_defect.faiss"),
+        ("indexes/index2_metadata.json",     "data/index2_metadata.json"),
+    ]
+
+    # Index 3 — one per category
+    categories = [
+        'bottle','cable','capsule','carpet','grid','hazelnut',
+        'leather','metal_nut','pill','screw','tile','toothbrush',
+        'transistor','wood','zipper'
+    ]
+    for cat in categories:
+        files_to_download.append((
+            f"indexes/index3_{cat}.faiss",
+            f"data/index3_{cat}.faiss"
+        ))
+
+    for repo_path, local_path in files_to_download:
+        if os.path.exists(local_path):
+            print(f"Already exists: {local_path}")
+            continue
+        try:
+            print(f"Downloading {repo_path}...")
+            downloaded = hf_hub_download(
+                repo_id=HF_REPO,
+                filename=repo_path,
+                repo_type="dataset",
+                token=token,
+                local_dir="/tmp/artifacts"
+            )
+            shutil.copy(downloaded, local_path)
+            print(f"  → {local_path}")
+        except Exception as e:
+            print(f"  WARNING: Could not download {repo_path}: {e}")
 
 def load_all():
     """
@@ -35,6 +84,10 @@ def load_all():
     print("=" * 50)
     print("AnomalyOS startup sequence")
     print("=" * 50)
+
+    # Download artifacts first
+    download_artifacts()
+    
 
     # ── CPU thread tuning ─────────────────────────────────────
     # HF Spaces CPU Basic = 2 vCPU
