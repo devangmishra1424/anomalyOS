@@ -1,0 +1,5 @@
+outs:
+- md5: 1990cf4d35822aaa1b5fb8281ff8dfe5
+  size: 85761505
+  hash: md5
+  path: midas_small.onnx
