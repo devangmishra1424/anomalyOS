@@ -29,7 +29,7 @@ jobs:
           pip install pytest fastapi httpx pydantic numpy pillow
 
       - name: Run pytest
-        run: pytest tests/test_api.py -v --tb=short
+        run: PYTHONPATH=. pytest tests/test_api.py -v --tb=short
 
       - name: Deploy to HuggingFace Spaces
         env:
