@@ -26,7 +26,7 @@ jobs:
 
       - name: Install test dependencies only
         run: |
-          pip install pytest fastapi httpx pydantic numpy pillow
+          pip install pytest fastapi httpx pydantic numpy pillow python-multipart
 
       - name: Run pytest
         run: PYTHONPATH=. pytest tests/test_api.py -v --tb=short
