@@ -349,5 +349,5 @@ with gr.Blocks(title="AnomalyOS", theme=gr.themes.Soft()) as demo:
             analytics_out = gr.Textbox(label="System Stats", lines=15)
 
             btn_refresh.click()
-                fn=load_analytics,
-                inputs=[],
+            fn=load_analytics,
+            inputs=[],

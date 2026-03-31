@@ -29,7 +29,17 @@ class KnowledgeGraph:
         with open(path) as f:
             data = json.load(f)
 
-        self.graph = nx.node_link_graph(data)
+        # Handle both old and new NetworkX node-link formats
+        if "links" in data:
+            data["links"] = data.get("links", [])
+        try:
+            self.graph = nx.node_link_graph(data)
+        except Exception:
+            # Try with edges key for older NetworkX
+            if "links" in data and "edges" not in data:
+                data["edges"] = data.pop("links")
+            self.graph = nx.node_link_graph(data)
+
         print(f"Knowledge graph loaded: "
               f"{self.graph.number_of_nodes()} nodes, "
               f"{self.graph.number_of_edges()} edges")
