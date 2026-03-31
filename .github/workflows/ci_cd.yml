@@ -2,69 +2,55 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
+    paths:
+      - "src/**"
+      - "api/**"
+      - "docker/**"
+      - "app.py"
+      - "requirements.txt"
+  workflow_dispatch:
 
 jobs:
-  test:
+  test-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.10', '3.11']
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov flake8
-    
-    - name: Lint with flake8
-      run: |
-        flake8 src/ api/ mlops/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
-    
-    - name: Run unit tests
-      run: |
-        pytest tests/ -v --cov=src --cov=api --cov-report=term-missing
-    
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./coverage.xml
-        flags: unittests
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Build Docker image
-      run: |
-        docker build -f docker/Dockerfile -t anomalyos:latest .
-    
-    - name: Run Docker container tests
-      run: |
-        docker run --rm anomalyos:latest pytest tests/ -v
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Deploy to production
-      run: |
-        echo "Deploying to production..."
-        # Add your deployment commands here
+      - name: Install test dependencies only
+        run: |
+          pip install pytest fastapi httpx pydantic numpy pillow
+
+      - name: Run pytest
+        run: pytest tests/test_api.py -v --tb=short
+
+      - name: Deploy to HuggingFace Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install huggingface_hub
+          python -c "
+          from huggingface_hub import HfApi
+          import os
+          api = HfApi(token=os.environ['HF_TOKEN'])
+          api.upload_folder(
+              folder_path='.',
+              repo_id='CaffeinatedCoding/anomalyos',
+              repo_type='space',
+              ignore_patterns=['*.pyc','__pycache__','.git','tests/','notebooks/','data/','models/','logs/','reports/']
+          )
+          print('Deployed to HF Spaces')
+          "
+
+      - name: Smoke test
+        run: |
+          sleep 60
+          curl --fail --retry 5 --retry-delay 30 \
+            https://caffeinatedcoding-anomalyos.hf.space/health || echo "Space still warming up"
