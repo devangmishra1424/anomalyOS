@@ -119,67 +119,68 @@ def load_all():
 
     # ── CLIP model ────────────────────────────────────────────
     # Loaded here, injected into orchestrator
-    print("Loading CLIP ViT-B/32...")
+    print("Loading CLIP ViT-B/32...", flush=True)
     try:
+        print("  [Downloading CLIP weights...]", flush=True)
         clip_model, clip_preprocess = clip.load("ViT-B/32", device="cpu")
+        print("  [CLIP weights loaded, setting eval mode...]", flush=True)
         clip_model.eval()
-        print("CLIP loaded ✓")
+        print("CLIP loaded ✓", flush=True)
     except Exception as e:
-        print(f"ERROR loading CLIP: {e}")
+        print(f"ERROR loading CLIP: {e}", flush=True)
         raise
 
-    # ── Thresholds ────────────────────────────────────────────
-    print("Loading thresholds...")
+    print("Loading thresholds...", flush=True)
     thresholds_path = os.path.join(
         os.environ.get("DATA_DIR", "data"), "thresholds.json"
     )
     if os.path.exists(thresholds_path):
         with open(thresholds_path) as f:
             thresholds = json.load(f)
-        print(f"Thresholds loaded ✓ {len(thresholds)} categories")
+        print(f"Thresholds loaded ✓ {len(thresholds)} categories", flush=True)
     else:
         thresholds = {}
-        print("WARNING: thresholds.json not found — using score > 0.5 fallback")
+        print("WARNING: thresholds.json not found — using score > 0.5 fallback", flush=True)
 
     # ── GradCAM++ ─────────────────────────────────────────────
-    print("Loading GradCAM++...")
+    print("Loading GradCAM++...", flush=True)
     try:
         gradcam.load()
-        print("GradCAM++ loaded ✓")
+        print("GradCAM++ loaded ✓", flush=True)
     except Exception as e:
-        print(f"WARNING: GradCAM++ load failed: {e}")
-        print("Forensics mode will run without GradCAM++")
+        print(f"WARNING: GradCAM++ load failed: {e}", flush=True)
+        print("Forensics mode will run without GradCAM++", flush=True)
 
     # ── SHAP background ───────────────────────────────────────
-    print("Loading SHAP background...")
+    print("Loading SHAP background...", flush=True)
     bg_path = os.path.join(
         os.environ.get("DATA_DIR", "data"), "shap_background.npy"
     )
     try:
         if os.path.exists(bg_path):
             shap_explainer.load_background(bg_path)
-            print("SHAP background loaded ✓")
+            print("SHAP background loaded ✓", flush=True)
         else:
-            print(f"WARNING: SHAP background not found at {bg_path}")
-            print("SHAP explanations will use default background")
+            print(f"WARNING: SHAP background not found at {bg_path}", flush=True)
+            print("SHAP explanations will use default background", flush=True)
     except Exception as e:
-        print(f"WARNING: SHAP background load failed: {e}")
-        print("SHAP explanations will use default background")
+        print(f"WARNING: SHAP background load failed: {e}", flush=True)
+        print("SHAP explanations will use default background", flush=True)
 
     # ── Inject into orchestrator ──────────────────────────────
-    print("Initializing orchestrator...")
+    print("Initializing orchestrator...", flush=True)
     try:
         init_orchestrator(clip_model, clip_preprocess, thresholds)
-        print("Orchestrator initialized ✓")
+        print("Orchestrator initialized ✓", flush=True)
     except Exception as e:
-        print(f"ERROR initializing orchestrator: {e}")
+        print(f"ERROR initializing orchestrator: {e}", flush=True)
         raise
 
     elapsed = time.time() - STARTUP_TIME
-    print("=" * 50)
-    print(f"Startup complete in {elapsed:.1f}s ✓")
-    print(f"Model version: {MODEL_VERSION}")
-    print("=" * 50)
+    print("=" * 50, flush=True)
+    print(f"Startup complete in {elapsed:.1f}s ✓", flush=True)
+    print(f"Model version: {MODEL_VERSION}", flush=True)
+    print("=" * 50, flush=True)
 
     return {
         "clip_model": clip_model,
