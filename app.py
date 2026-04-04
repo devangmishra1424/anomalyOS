@@ -14,7 +14,7 @@ import io
 import numpy as np
 
 
-API_BASE = "http://localhost:7860"
+API_BASE = "http://localhost:8000"
 SESSION_ID = str(uuid.uuid4())
 
 CATEGORIES = [

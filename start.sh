@@ -1,9 +1,9 @@
 #!/bin/bash
-# Start FastAPI in background
-uvicorn api.main:app --host 0.0.0.0 --port 7860 &
+# FastAPI on internal port 8000
+uvicorn api.main:app --host 0.0.0.0 --port 8000 &
 
 # Wait for FastAPI to be ready
-sleep 10
+sleep 15
 
-# Start Gradio on port 7861
+# Gradio on 7860 (HF Spaces public port)
 python app.py
