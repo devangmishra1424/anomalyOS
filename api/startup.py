@@ -120,41 +120,64 @@ def load_all():
     # ── CLIP model ────────────────────────────────────────────
     # Loaded here, injected into orchestrator
     print("Loading CLIP ViT-B/32...")
-    clip_model, clip_preprocess = clip.load("ViT-B/32", device="cpu")
-    clip_model.eval()
-    print("CLIP loaded")
+    try:
+        clip_model, clip_preprocess = clip.load("ViT-B/32", device="cpu")
+        clip_model.eval()
+        print("CLIP loaded ✓")
+    except Exception as e:
+        print(f"ERROR loading CLIP: {e}")
+        raise
 
     # ── Thresholds ────────────────────────────────────────────
+    print("Loading thresholds...")
     thresholds_path = os.path.join(
         os.environ.get("DATA_DIR", "data"), "thresholds.json"
     )
     if os.path.exists(thresholds_path):
         with open(thresholds_path) as f:
             thresholds = json.load(f)
-        print(f"Thresholds loaded: {len(thresholds)} categories")
+        print(f"Thresholds loaded ✓ {len(thresholds)} categories")
     else:
         thresholds = {}
         print("WARNING: thresholds.json not found — using score > 0.5 fallback")
 
     # ── GradCAM++ ─────────────────────────────────────────────
+    print("Loading GradCAM++...")
     try:
         gradcam.load()
+        print("GradCAM++ loaded ✓")
     except Exception as e:
         print(f"WARNING: GradCAM++ load failed: {e}")
         print("Forensics mode will run without GradCAM++")
 
     # ── SHAP background ───────────────────────────────────────
+    print("Loading SHAP background...")
     bg_path = os.path.join(
         os.environ.get("DATA_DIR", "data"), "shap_background.npy"
     )
-    shap_explainer.load_background(bg_path)
+    try:
+        if os.path.exists(bg_path):
+            shap_explainer.load_background(bg_path)
+            print("SHAP background loaded ✓")
+        else:
+            print(f"WARNING: SHAP background not found at {bg_path}")
+            print("SHAP explanations will use default background")
+    except Exception as e:
+        print(f"WARNING: SHAP background load failed: {e}")
+        print("SHAP explanations will use default background")
 
     # ── Inject into orchestrator ──────────────────────────────
-    init_orchestrator(clip_model, clip_preprocess, thresholds)
+    print("Initializing orchestrator...")
+    try:
+        init_orchestrator(clip_model, clip_preprocess, thresholds)
+        print("Orchestrator initialized ✓")
+    except Exception as e:
+        print(f"ERROR initializing orchestrator: {e}")
+        raise
 
     elapsed = time.time() - STARTUP_TIME
     print("=" * 50)
-    print(f"Startup complete in {elapsed:.1f}s")
+    print(f"Startup complete in {elapsed:.1f}s ✓")
     print(f"Model version: {MODEL_VERSION}")
     print("=" * 50)
 
