@@ -99,11 +99,13 @@ class FAISSRetriever:
     def retrieve_similar_defects(self,
                                   clip_crop_embedding: np.ndarray,
                                   k: int = 5,
-                                  exclude_hash: str = None) -> list:
+                                  exclude_hash: str = None,
+                                  category_filter: str = None) -> list:
         """
         Given a defect-crop CLIP embedding, return k most similar
         historical defect cases.
         exclude_hash: skip self-match (same image submitted again)
+        category_filter: only return cases from specified category
         Returns: list of metadata dicts with similarity scores
         """
         query = clip_crop_embedding.reshape(1, -1).astype(np.float32)
@@ -118,6 +120,9 @@ class FAISSRetriever:
                 continue
             meta = self.index2_metadata[idx].copy()
             meta["similarity_score"] = float(dist)
+            # Filter by category if provided
+            if category_filter and meta.get("category") != category_filter:
+                continue
             # Skip self-match
             if exclude_hash and meta.get("image_hash") == exclude_hash:
                 continue

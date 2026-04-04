@@ -206,7 +206,8 @@ def run_inspection(pil_img: Image.Image,
 
     # ── STEP 7: Index 2 retrieval ─────────────────────────────
     similar_cases = retriever.retrieve_similar_defects(
-        clip_crop, k=5, exclude_hash=image_hash
+        clip_crop, k=5, exclude_hash=image_hash,
+        category_filter=category
     )
 
     # ── STEP 8: Knowledge graph traversal ────────────────────

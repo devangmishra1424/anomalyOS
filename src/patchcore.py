@@ -160,17 +160,16 @@ class PatchCoreExtractor:
 
     def get_anomaly_centroid(self, heatmap: np.ndarray) -> tuple:
         """
-        Find centroid of highest-activation region.
+        Find the peak (highest activation) location of the anomaly.
         Used to locate defect crop for Index 2 retrieval.
-        Returns: (cx, cy) pixel coordinates
+        Returns: (cx, cy) pixel coordinates of maximum activation
         """
-        threshold = np.percentile(heatmap, 90)
-        mask = heatmap > threshold
-        if mask.sum() == 0:
+        if heatmap.size == 0:
             return (112, 112)   # centre fallback
-
-        ys, xs = np.where(mask)
-        return (int(xs.mean()), int(ys.mean()))
+        
+        # Use peak location, not mean of thresholded region
+        max_idx = np.unravel_index(np.argmax(heatmap), heatmap.shape)
+        return (int(max_idx[1]), int(max_idx[0]))  # cx, cy
 
     def calibrate_score(self,
                          raw_score: float,
