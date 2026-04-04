@@ -97,6 +97,23 @@ DagsHub provides free hosted MLflow tracking and DVC remote storage under one ac
 
 ## Performance
 
+### Ablation Study: Coreset Size vs Quality/Latency
+
+| Coreset % | Image AUROC | AUPRO | Latency |
+|-----------|-------------|-------|---------|
+| 0.1% | 0.9414 | 0.6476 | 1.5ms |
+| 1.0% | **0.9737** | **0.6979** | 11.7ms |
+
+**Deployed at 1% coreset.**
+Target AUROC ≥0.97 ✓ | Target AUPRO ≥0.85 ✗
+
+AUPRO gap is a known PatchCore limitation at low coreset percentages.
+The PatchCore paper (Roth et al., CVPR 2022) reports AUPRO ≥0.85 
+at 10% coreset. Deployment at 1% prioritises CPU latency over 
+localisation precision — an explicit engineering tradeoff.
+
+---
+
 ### Image AUROC per Category (PatchCore, 1% coreset)
 
 | Category | AUROC | | Category | AUROC |
