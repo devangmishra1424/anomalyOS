@@ -6,6 +6,7 @@
 import os
 import json
 import time
+import sys
 import torch
 import clip
 
@@ -130,34 +131,67 @@ def load_all():
         print(f"ERROR loading CLIP: {e}", flush=True)
         raise
 
+    # DEBUG: Aggressive output buffer flushing after CLIP
+    sys.stdout.write("[DEBUG] Point 1: After CLIP load\n")
+    sys.stdout.flush()
+    
     print("Loading thresholds...", flush=True)
+    sys.stdout.write("[DEBUG] Point 2: After thresholds print\n")
+    sys.stdout.flush()
+    
+    sys.stdout.write("[DEBUG] Point 2a: Building thresholds path\n")
+    sys.stdout.flush()
     thresholds_path = os.path.join(
         os.environ.get("DATA_DIR", "data"), "thresholds.json"
     )
+    sys.stdout.write(f"[DEBUG] Point 2b: Checking if {thresholds_path} exists\n")
+    sys.stdout.flush()
+    
     if os.path.exists(thresholds_path):
+        sys.stdout.write("[DEBUG] Point 2c: File exists, opening\n")
+        sys.stdout.flush()
         with open(thresholds_path) as f:
+            sys.stdout.write("[DEBUG] Point 2d: File opened, loading JSON\n")
+            sys.stdout.flush()
             thresholds = json.load(f)
         print(f"Thresholds loaded ✓ {len(thresholds)} categories", flush=True)
     else:
         thresholds = {}
         print("WARNING: thresholds.json not found — using score > 0.5 fallback", flush=True)
 
+    sys.stdout.write("[DEBUG] Point 3: After thresholds loading\n")
+    sys.stdout.flush()
+
     # ── GradCAM++ ─────────────────────────────────────────────
+    sys.stdout.write("[DEBUG] Point 4: Before GradCAM load\n")
+    sys.stdout.flush()
     print("Loading GradCAM++...", flush=True)
     try:
+        sys.stdout.write("[DEBUG] Point 4a: Inside GradCAM load try\n")
+        sys.stdout.flush()
         gradcam.load()
         print("GradCAM++ loaded ✓", flush=True)
     except Exception as e:
         print(f"WARNING: GradCAM++ load failed: {e}", flush=True)
         print("Forensics mode will run without GradCAM++", flush=True)
 
+    sys.stdout.write("[DEBUG] Point 5: After GradCAM load\n")
+    sys.stdout.flush()
+
     # ── SHAP background ───────────────────────────────────────
+    sys.stdout.write("[DEBUG] Point 6: Before SHAP load\n")
+    sys.stdout.flush()
     print("Loading SHAP background...", flush=True)
+    sys.stdout.write("[DEBUG] Point 6a: After SHAP print\n")
+    sys.stdout.flush()
+    
     bg_path = os.path.join(
         os.environ.get("DATA_DIR", "data"), "shap_background.npy"
     )
     try:
         if os.path.exists(bg_path):
+            sys.stdout.write("[DEBUG] Point 6b: SHAP file exists, loading\n")
+            sys.stdout.flush()
             shap_explainer.load_background(bg_path)
             print("SHAP background loaded ✓", flush=True)
         else:
@@ -168,14 +202,23 @@ def load_all():
         print("SHAP explanations will use default background", flush=True)
 
     # ── Inject into orchestrator ──────────────────────────────
+    sys.stdout.write("[DEBUG] Point 7: Before orchestrator init\n")
+    sys.stdout.flush()
     print("Initializing orchestrator...", flush=True)
+    sys.stdout.write("[DEBUG] Point 7a: About to call init_orchestrator\n")
+    sys.stdout.flush()
     try:
         init_orchestrator(clip_model, clip_preprocess, thresholds)
+        sys.stdout.write("[DEBUG] Point 7b: init_orchestrator returned\n")
+        sys.stdout.flush()
         print("Orchestrator initialized ✓", flush=True)
     except Exception as e:
         print(f"ERROR initializing orchestrator: {e}", flush=True)
         raise
 
+    sys.stdout.write("[DEBUG] Point 8: After orchestrator init — about to print completion\n")
+    sys.stdout.flush()
+    
     elapsed = time.time() - STARTUP_TIME
     print("=" * 50, flush=True)
     print(f"Startup complete in {elapsed:.1f}s ✓", flush=True)
