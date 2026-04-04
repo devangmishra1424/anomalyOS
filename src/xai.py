@@ -65,7 +65,9 @@ class GradCAMPlusPlus:
             )
         else:
             # Fallback: pretrained ImageNet weights (weaker XAI but not None)
-            self.model = models.efficientnet_b0(pretrained=True)
+            self.model = models.efficientnet_b0(
+                weights=models.EfficientNet_B0_Weights.IMAGENET1K_V1
+            )
             print("WARNING: EfficientNet fine-tuned weights not found. "
                   "Using ImageNet pretrained — GradCAM++ quality reduced.")
 
