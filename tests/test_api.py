@@ -22,7 +22,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024
 
 @test_app.get("/health")
 def health():
-    return {"status": "ok", "model_version": "v1.0",
+    return {"status": "ok", "version": "v1.0",
             "uptime_seconds": 0.0, "index_sizes": {},
             "coreset_size": 0, "threshold_config_version": "v1.0",
             "cache_stats": {}}
@@ -60,7 +60,7 @@ async def inspect(
         raise HTTPException(status_code=422, detail="Cannot decode image")
     return {"is_anomalous": True, "anomaly_score": 0.75,
             "calibrated_score": 0.82, "score_std": 0.05,
-            "category": "bottle", "model_version": "v1.0",
+            "category": "bottle", "version": "v1.0",
             "image_hash": "abc123", "latency_ms": 250.0,
             "low_confidence": False, "similar_cases": [],
             "graph_context": {}, "shap_features": {}, "report_id": "test-id"}
@@ -105,7 +105,7 @@ class TestHealthEndpoint:
     def test_health_has_required_fields(self):
         body = client.get("/health").json()
         assert "status" in body
-        assert "model_version" in body
+        assert "version" in body
         assert body["status"] == "ok"
 
 

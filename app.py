@@ -101,7 +101,7 @@ def run_inspector(image, category_hint, last_click_state):
     meta    = (f"Category: {category} | "
                f"Raw score: {result.get('anomaly_score', 0):.4f} | "
                f"Latency: {latency:.0f}ms | "
-               f"Model: {result.get('model_version', 'v1.0')}")
+               f"Model: {result.get('version', 'v1.0')}")
 
     # Poll LLM report
     report_id = result.get("report_id")

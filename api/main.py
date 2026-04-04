@@ -181,7 +181,7 @@ async def inspect(
         calibrated_score=result.calibrated_score,
         score_std=result.score_std,
         category=result.category,
-        model_version=MODEL_VERSION,
+        version=MODEL_VERSION,
         heatmap_b64=result.heatmap_b64,
         defect_crop_b64=result.defect_crop_b64,
         depth_map_b64=result.depth_map_b64,
@@ -501,7 +501,7 @@ async def health():
 
     return HealthResponse(
         status="ok",
-        model_version=MODEL_VERSION,
+        version=MODEL_VERSION,
         uptime_seconds=round(get_uptime(), 1),
         index_sizes=index_status,
         coreset_size=sum(

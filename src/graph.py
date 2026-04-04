@@ -24,21 +24,34 @@ class KnowledgeGraph:
     def load(self):
         path = os.path.join(self.data_dir, "knowledge_graph.json")
         if not os.path.exists(path):
-            raise FileNotFoundError(f"Knowledge graph not found: {path}")
+            print(f"Warning: Knowledge graph not found at {path}, using empty graph")
+            self.graph = nx.DiGraph()
+            return
 
-        with open(path) as f:
-            data = json.load(f)
-
-        # Handle both old and new NetworkX node-link formats
-        if "links" in data:
-            data["links"] = data.get("links", [])
         try:
-            self.graph = nx.node_link_graph(data)
-        except Exception:
-            # Try with edges key for older NetworkX
-            if "links" in data and "edges" not in data:
-                data["edges"] = data.pop("links")
-            self.graph = nx.node_link_graph(data)
+            with open(path) as f:
+                data = json.load(f)
+        except Exception as e:
+            print(f"Warning: Failed to load knowledge graph JSON: {e}")
+            self.graph = nx.DiGraph()
+            return
+
+        # Try standard NetworkX node_link_graph format (expects 'links' or 'edges')
+        try:
+            self.graph = nx.node_link_graph(data, directed=True)
+        except (KeyError, TypeError):
+            # If that fails, try converting 'edges' key to 'links'
+            if "edges" in data:
+                data["links"] = data.pop("edges")
+                try:
+                    self.graph = nx.node_link_graph(data, directed=True)
+                except Exception as e:
+                    print(f"Warning: Failed to load graph with edges→links conversion: {e}")
+                    self.graph = nx.DiGraph()
+            else:
+                # Last resort: create empty graph
+                print(f"Warning: Knowledge graph format not recognized, using empty graph")
+                self.graph = nx.DiGraph()
 
         print(f"Knowledge graph loaded: "
               f"{self.graph.number_of_nodes()} nodes, "

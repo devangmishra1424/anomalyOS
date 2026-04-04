@@ -22,7 +22,7 @@ class InspectResponse(BaseModel):
     calibrated_score:   float = Field(..., ge=0.0, le=1.0)
     score_std:          float
     category:           str
-    model_version:      str
+    version:            str
 
     # Visuals (base64 PNG strings)
     heatmap_b64:        Optional[str] = None
@@ -116,7 +116,7 @@ class CorrectionResponse(BaseModel):
 # ── /health ──────────────────────────────────────────────────
 class HealthResponse(BaseModel):
     status:               str
-    model_version:        str
+    version:              str
     uptime_seconds:       float
     index_sizes:          dict
     coreset_size:         int
