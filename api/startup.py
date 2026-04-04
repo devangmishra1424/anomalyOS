@@ -36,6 +36,7 @@ def download_artifacts():
 
     files_to_download = [
         ("models/pca_256.pkl",              "data/pca_256.pkl"),
+        ("models/midas_small.onnx",         "data/midas_small.onnx"),
         ("configs/thresholds.json",          "data/thresholds.json"),
         ("graph/knowledge_graph.json",       "data/knowledge_graph.json"),
         ("indexes/index1_category.faiss",    "data/index1_category.faiss"),

@@ -149,7 +149,7 @@ class PatchCoreExtractor:
 
         # Gaussian smoothing
         if smooth:
-            heatmap = scipy.ndimage.gaussian_filter(heatmap, sigma=4)
+            heatmap = scipy.ndimage.gaussian_filter(heatmap, sigma=2)
 
         # Normalise to [0, 1]
         h_min, h_max = heatmap.min(), heatmap.max()
