@@ -354,3 +354,7 @@ with gr.Blocks(title="AnomalyOS", theme=gr.themes.Soft()) as demo:
                 outputs=[analytics_out]
             )
             demo.load(fn=load_analytics, inputs=[], outputs=[analytics_out])
+
+
+if __name__ == "__main__":
+    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
